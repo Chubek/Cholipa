@@ -133,6 +133,9 @@ and storage_specifier =
   | Typedef
   | Extern
   | Static
+  | Auto
+  | Register
+  | ThreadLocal
 
 and function_specifier =
   | Inline
@@ -238,7 +241,9 @@ and specifier_qualifier_list = type_specifier list * type_qualifier list
 
 and struct_declarator_list = struct_declarator list
 
-and struct_declarator = declarator * constant_expression option
+and bitfield_width = int
+
+and struct_declarator = declarator * constant_expression option * bitfield_width option
 
 and constant_expression = expression
 
@@ -269,6 +274,10 @@ and statement =
   | ContinueStatement
   | BreakStatement
   | ReturnStatement of expression option
+  | AssemblyStatement of string * constant_expression list * constant_expression list
+  | RustStatement of string * constant_expression list * constant_expression list
+  | GoStatement of string * constant-expression list * constant_expression list
+  | ShellStatement of string * constant_expression list * constant_expression list 
 
 and block_item =
   | DeclarationItem of declaration
@@ -291,10 +300,17 @@ type pp_directive =
   | DefineDirective of string * pp_macro_body
   | UndefDirective of string
   | PragmaDirective of string
+  | ErrorDirective of string
+  | LineDirective of int
+  | ExecDirective of string
+  | PrintDirective of string
+  | DelimExecDirective of string * string
+  | DivertDirective of int
+  | UndivertDirective of int
 
 and pp_macro_definition =
-  | ObjectMacro of string * macro_body
-  | FunctionMacro of string * string list * macro_body
+  | ObjectMacro of string * pp_macro_body
+  | FunctionMacro of string * string list * pp_macro_body
 
 and pp_macro_body =
   | SimpleBody of string
@@ -312,9 +328,9 @@ and pp_conditional =
 
 and pp_expression =
   | Identifier of string
-  | Constant of constant
-  | BinaryExpression of expression * binary_operator * expression
-  | UnaryExpression of unary_operator * expression
+  | Constant of pp_constant_expression
+  | BinaryExpression of pp_expression * pp_binary_operator * pp_expression
+  | UnaryExpression of pp_unary_operator * pp_expression
   | DefinedExpression of string
 
 and pp_binary_operator =
@@ -329,6 +345,7 @@ and pp_constant_expression =
   | PPIntegerConstant of int
   | PPStringLiteral of string
   | PPIdentifier of identifier
+  | PPStringFmt of string * string list
 
 and c_preprocessor =
   | PPDirective of pp_directive
@@ -336,4 +353,3 @@ and c_preprocessor =
   | PPConditional of pp_conditional
   | PPConstant of pp_constant
 
-a
