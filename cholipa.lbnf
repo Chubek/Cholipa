@@ -1,0 +1,126 @@
+StmtDecl.    Stmt1 ::= [Decl]			;
+
+StmtLblDfl.  Stmt1 ::= "default:" Stmt2		;
+StmtLblCase. Stmt1 ::= "case" Expr5 ":" Stmt2 	;
+StmtLblId.   Stmt1 ::= Ident ":" Stmt2		;
+
+separator nonempty Stmt ";"	;
+
+_. Stmt2 ::= "{" [Stmt] "}"	;
+_. Stmt1 ::= Stmt2		;
+_. Stmt	 ::= Stm1		;
+
+separator nonempty Decl ","	;
+separator nonempty DeclAssn ","    ;
+
+DAssnInit.    DeclAssn1 ::= Ident "=" Expr	;
+DAssnNonInit. DeclAssn  ::= Ident		;
+
+_. DeclAssn1 ::= "(" DeclAssn ")"	;
+_. DeclAssn  ::= DeclAssn1		;
+
+DeclUnit.     Decl ::= Decl [DeclAssn]		;
+DeclInit.     Decl ::= Decl Ident "=" Expr	;
+DeclNonInit.  Decl ::= Decl Ident;
+
+TyStlTyDef.    Decl ::= "typedef"   Decl	;
+TyStlExtern.   Decl ::= "extern"    Decl	;
+TyStlStatic.   Decl ::= "static"    Decl	;
+TyStlAuto.     Decl ::= "auto"      Decl 	;
+TyStlRegister. Decl ::= "register"  Decl 	;
+
+TyQualVolatile. Decl ::= "volatile" Decl	;
+TyQualRestrict.	Decl ::= "restrict" Decl 	;
+TyQualConst. 	Decl ::= "const"    Decl	;
+
+DeclSpec.  Decl ::= TySpec Ident	;
+DeclId.    Decl ::= TyId Ident	;
+
+TyGroup.    TySpec ::= TySpec1 TySpec  ;
+TyPointer.  TySepc ::= TySpec1 "*"     ;
+
+TyArr.      TySpec ::= ArrIdx			   ;
+TyEnum.     TySpec ::= Enum   "{" [EnumDecl]   "}" ;
+TyUnion.    TySpec ::= Union  "{" [StructDecl] "}" ;
+TyStruct.   TySpec ::= Struct "{" [StructDecl] "}" ;
+
+TyUnsigned. TySpec ::= "unsigned" ;
+TySigned.   TySpec ::= "signed"   ;
+TyDouble.   TySpec ::= "double"   ;
+TyFloat.    TySpec ::= "float"    ;
+TyLong.     TySpec ::= "long"     ;
+TyInt.	    TySpec ::= "int"	  ;
+TyShort.    TySpec ::= "short"    ;
+TyChar.     TySpec ::= "char"	  ;
+TyVoid.     TySpec ::= "void"	  ;
+
+_. TySpec1 = TySpec  ;
+
+separator nonempty EnumDecl   ","       ;
+separator nonempty StructDecl ";"	;
+
+TyIdRaw.     TyId ::= Ident		;
+TyIdUnion.   TyId ::= "union" Ident	;
+TyIdEnum.    TyId ::= "enum" Ident	;
+TyIdStruct.  TyId ::= "struct" Ident	;
+
+ArrayIdxId.  ArrIdx ::= "[" Ident   "]"	;
+ArrayIdxNum. ArrIdx ::= "[" Integer "]"	;
+
+UniIdent. Union  ::= Union1 Ident	;
+UniAnon.  Union1 ::= "union		;
+
+EnuIdent. Enum   ::= Enum1 Ident	;
+EnuAnon.  Enum1  ::= "enum"		;
+
+StuIdent. Struct  ::= Struct1 Ident     ;
+StuAnon.  Struct1 ::= "struct"		;
+
+DEnum.   EnumDecl   ::= Ident		;
+DStruct. StructDecl ::= TySpec Ident	;
+
+separator nonempty Expr "," ;
+
+ECall.   Expr6 ::= Ident "(" [Expr] ")"          ;
+
+separator SPair ","			;
+AssnPair. SPair ::= "." Ident "=" Expr  ;
+
+EInt.    Expr5 ::= Integer   ;
+EChar.   Expr5 ::= Char	     ;
+EDouble. Expr5 ::= Double    ;
+EIdent.  Expr5 ::= Ident     ;
+EString. Expr6 ::= String    ;
+EStruct. Expr6 ::= "(" TySpec ")" "{" [SPair] "}" ;
+
+EAnd.    Expr4 ::= Expr4 "&&" Expr5 ;
+EOr.     Expr4 ::= Expr4 "||" Expr5 ;
+
+EPos.    Expr4 ::= "+" Expr5 ;
+ENeg.	 Expr4 ::= "-" Expr5 ;
+EBitNot. Expr4 ::= "~" Expr5 ;
+ENot.    Expr4 ::= "!" Expr5 ;
+
+EBitShl. Expr2 ::= Expr2 "<<" Expr3 ;
+EBitShr. Expr2 ::= Expr2 ">>" Expr3 ;
+EBitXor. Expr2 ::= Expr2 "^"  Expr3 ;
+EBitOr.  Expr2 ::= Expr2 "|"  Expr3 ;
+EBitAnd. Expr2 ::= Expr2 "&"  Expr3 ;
+
+EPower.  Expr1 ::= Expr1 "**" Expr2 ;
+EModulo. Expr1 ::= Expr1 "%"  Expr2 ;
+ERound.  Expr1 ::= Expr1 "//" Expr2 ;
+EDivide. Expr1 ::= Expr1 "/"  Expr2 ;
+ETimes.  Expr1 ::= Expr1 "*"  Expr2 ;
+
+EPlus.   Expr  ::= Expr  "+"  Expr1 ;
+EMinus.  Expr  ::= Expr "-"   Expr1 ;
+
+_.       Expr6 ::= "(" Expr ")" ;
+_.       Expr5 ::= Expr6 ;
+_.	 Expr4 ::= Expr5 ;
+_.       Expr3 ::= Expr4 ;
+_.       Expr2 ::= Expr3 ;
+_.       Expr1 ::= Expr2 ;
+_.       Expr  ::= Expr1 ;
+
