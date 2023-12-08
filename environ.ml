@@ -1,36 +1,27 @@
 #use "absyn"
 
-type symbol_table_entry = {
-        ident: identifier;
-        typ: type_specifier;
-        value: program;
-        level: symbol_entry_level;
-        parent: symbol_table_entry;
-        children symbol_table_entry list;
+type symbol_table_node = {
+        name: identifier;
+        tyy: type_specifier;
+        tree: program;
+        lexscope: symbol_lexical_scope;
+        next: symbol_table_node option;
 }
 
-and direction_graph_entry = {
-        ident: identifier;
-        deps: direction_graph_entry list;
-        next: direction-graph_entry;
-}
+and symbol_lexical_scope =
+   | GlobalScope
+   | FunctionScope of int
+   | LocalScope of int
+;;
 
-and flow_graph_ir = string
+type symbol_table = symbol_table_node option
 
-and ssa_graph_ir = string
-
-and linear_ir = string
-
-and symbol_entry_level =
-   | Global
-   | Scope of int
-   | Local of int
-
-and environment = {
-        root_symtable: symbol_table_entry;
-        control_flow: flow_graph_ir;
-        ssa_graph: ssa_graph_ir;
-        linear_repr: linear_ir;
-        dependencies: direction_graph_entry;
-
-}
+let symtab_insert ~sym_table name tyy tree lexscope : symbol_table = 
+        match sym_table with
+      | None -> {name;tyy;tree;lexscope;next=None;}
+      | Some -> 
+                      let {nm;ty;tr;lexs;next} = sym_table in
+                      match next with
+                    | None -> {nm;ty;tr;Some {name;tyy;tree;lexc;None}}
+                    | Some -> symtab_insert ~sym_table:sym_table name tyy tree
+;;
