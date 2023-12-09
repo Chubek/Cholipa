@@ -1,27 +1,35 @@
-#use "absyn"
-
-type symbol_table_node = {
-        name: identifier;
-        tyy: type_specifier;
-        tree: program;
-        lexscope: symbol_lexical_scope;
-        next: symbol_table_node option;
+type symbol_entry = {
+  name: identifier;
+  data_type: symbol_type;
+  offset: int;
 }
 
-and symbol_lexical_scope =
-   | GlobalScope
-   | FunctionScope of int
-   | LocalScope of int
-;;
+type scope_entry = {
+  parent: scope option;
+  symbols: symbol_entry list
+}
 
-type symbol_table = symbol_table_node option
+and scope = Scope of scope_entry
 
-let symtab_insert ~sym_table name tyy tree lexscope : symbol_table = 
-        match sym_table with
-      | None -> {name;tyy;tree;lexscope;next=None;}
-      | Some -> 
-                      let {nm;ty;tr;lexs;next} = sym_table in
-                      match next with
-                    | None -> {nm;ty;tr;Some {name;tyy;tree;lexc;None}}
-                    | Some -> symtab_insert ~sym_table:sym_table name tyy tree
-;;
+let create_symbol name data_type offset = { name; data_type; offset }
+
+let create_scope parent symbols = { parent; symbols }
+
+let add_symbol scope symbol =
+  match scope with
+  | Scope entry ->
+    let symbols = symbol :: entry.symbols in
+    Scope { entry with symbols }
+
+let rec lookup_symbol name scope =
+  match scope with
+  | Scope entry ->
+    let matching_symbols = List.filter (fun s -> s.name = name) entry.symbols in
+    match matching_symbols with
+    | [symbol] -> Some symbol
+    | _ -> (
+        match entry.parent with
+        | Some parent_scope -> lookup_symbol name parent_scope
+        | None -> None
+      )
+
