@@ -2,6 +2,10 @@
 open Printf
 open Parser
 
+let yyerror msg =
+        Printf.fprintf stderr msg;
+        exit 1
+
 let count () =
   let rec count_chars str col =
     match str with
@@ -21,6 +25,18 @@ let comment () =
     | _ -> consume_comment ()
   in
   consume_comment ()
+
+let check_type () =
+let rec check_inner acc =
+  match (input_char lexbuf) with
+  | 'L' -> check_inner (acc ^ "L")
+  | 'U' -> check_inner ("U" ^ acc)
+  | _ -> match acc with
+         | "LL" -> CONSTLL
+         | "ULL" -> CONSTULL
+         | "L" -> CONSTL
+         | "UL" -> CONSTUL
+         | _ -> yyerror "Incorrect integer constant prefix\n"
 
 }
 
